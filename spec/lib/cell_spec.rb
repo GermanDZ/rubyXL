@@ -66,6 +66,20 @@ describe RubyXL::Cell do
 
       # We expect to be exactly the same date
       expect(cell.value.to_time.utc.iso8601).to eq(expected_datetime.iso8601)
+
+      tm = Time.parse("2020-10-15T14:12:34.999999Z")
+      cell = @worksheet.add_cell(r, c, tm)
+      cell.set_number_format('ddd mmm dd, yyyy HH:MM:SS')
+
+      # Due to rounding errors, we allow microsecond precision on Time.
+      expect(cell.value - tm.to_datetime).to be_within(1.0/86400e6).of(0)
+
+      tm = Time.parse("2020-10-15T14:12:34.000001Z")
+      cell = @worksheet.add_cell(r, c, tm)
+      cell.set_number_format('ddd mmm dd, yyyy HH:MM:SS')
+
+      # Due to rounding errors, we allow microsecond precision on Time.
+      expect(cell.value - tm.to_datetime).to be_within(1.0/86400e6).of(0)
     end
   end
 
